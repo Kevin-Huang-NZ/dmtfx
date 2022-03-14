@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mahara.stocker.controller.LayoutController">
+   <top>
+      <GridPane prefHeight="36.0" prefWidth="1280.0" styleClass="top-menu-bar" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1011.0" minWidth="10.0" prefWidth="952.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="445.0" minWidth="10.0" prefWidth="328.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+             <GridPane fx:id="topMenu" GridPane.columnIndex="0">
+                 <columnConstraints>
+                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="10.0" />
+                     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" />
+                     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" />
+                     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" />
+                     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" />
+                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                 </columnConstraints>
+                 <rowConstraints>
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                 </rowConstraints>
+                 <children>
+                     <MenuButton mnemonicParsing="false" text="地名翻译" GridPane.columnIndex="1">
+                         <items>
+                             <MenuItem id="Project" mnemonicParsing="false" onAction="#handleListProject" styleClass="btn" text="项目" />
+                             <MenuItem id="PlaceName" mnemonicParsing="false" onAction="#handleListPlaceName" styleClass="btn" text="地名条目" />
+                         </items>
+                         <styleClass>
+                             <String fx:value="btn" />
+                             <String fx:value="menu-button" />
+                         </styleClass>
+                         <graphic>
+                             <FontIcon iconLiteral="fas-language" />
+                         </graphic>
+                     <font>
+                        <Font name="Microsoft YaHei" size="14.0" />
+                     </font>
+                     </MenuButton>
+                     <MenuButton mnemonicParsing="false" text="译写标准" GridPane.columnIndex="2">
+                         <items>
+                             <MenuItem id="Standard" mnemonicParsing="false" onAction="#handleListStandard" styleClass="btn" text="译写标准" />
+                             <MenuItem id="Transliteration" mnemonicParsing="false" onAction="#handleListTransliteration" styleClass="btn" text="音译表" />
+                             <MenuItem id="CommonWord" mnemonicParsing="false" onAction="#handleListCommonWord" styleClass="btn" text="常用词" />
+                             <MenuItem id="Roman" mnemonicParsing="false" onAction="#handleListRoman" styleClass="btn" text="罗马字母对照表" />
+                         </items>
+                         <styleClass>
+                             <String fx:value="btn" />
+                             <String fx:value="menu-button" />
+                         </styleClass>
+                         <graphic>
+                             <FontIcon iconLiteral="fas-book-open" />
+                         </graphic>
+                         <font>
+                             <Font name="Microsoft YaHei" size="14.0" />
+                         </font>
+                     </MenuButton>
+                     <MenuButton mnemonicParsing="false" text="用户管理" GridPane.columnIndex="3">
+                         <items>
+                             <MenuItem id="User" mnemonicParsing="false" onAction="#handleListUser" styleClass="btn" text="用户" />
+                             <MenuItem id="SysRole" mnemonicParsing="false" onAction="#handleListSyRole" styleClass="btn" text="用户角色" />
+                         </items>
+                         <styleClass>
+                             <String fx:value="btn" />
+                             <String fx:value="menu-button" />
+                         </styleClass>
+                         <graphic>
+                             <FontIcon iconLiteral="fas-users" />
+                         </graphic>
+                         <font>
+                             <Font name="Microsoft YaHei" size="14.0" />
+                         </font>
+                     </MenuButton>
+                     <MenuButton mnemonicParsing="false" text="设置" GridPane.columnIndex="4">
+                         <items>
+                             <MenuItem id="SysPage" mnemonicParsing="false" onAction="#handleListSysPage" styleClass="btn" text="系统页面" />
+                             <MenuItem id="SysFun" mnemonicParsing="false" onAction="#handleListSysFun" styleClass="btn" text="系统功能" />
+                         </items>
+                         <styleClass>
+                             <String fx:value="btn" />
+                             <String fx:value="menu-button" />
+                         </styleClass>
+                         <graphic>
+                             <FontIcon iconLiteral="fas-cogs" />
+                         </graphic>
+                         <font>
+                             <Font name="Microsoft YaHei" size="14.0" />
+                         </font>
+                     </MenuButton>
+                 </children>
+             </GridPane>
+            <GridPane GridPane.columnIndex="1">
+              <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="289.0" minWidth="10.0" prefWidth="289.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="159.0" minWidth="10.0" prefWidth="39.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label fx:id="loginUserLabel" alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="280.0" text="Label">
+                     <GridPane.margin>
+                        <Insets right="5.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <MenuButton fx:id="loginUserMenu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" prefHeight="20.0" prefWidth="25.0" GridPane.columnIndex="1">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#changePassword" styleClass="btn" text="修改密码" />
+                      <MenuItem mnemonicParsing="false" onAction="#signOut" styleClass="btn" text="退出">
+                           <graphic>
+                              <FontIcon iconLiteral="fas-sign-out-alt" />
+                           </graphic>
+                        </MenuItem>
+                    </items>
+                     <GridPane.margin>
+                        <Insets left="5.0" />
+                     </GridPane.margin>
+                      <font>
+                          <Font name="Microsoft YaHei" size="14.0" />
+                      </font>
+                     <graphic>
+                        <FontIcon iconLiteral="fas-align-justify" styleClass="menu-icon" />
+                     </graphic>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </MenuButton>
+               </children>
+            </GridPane>
+         </children>
+      </GridPane>
+   </top>
+   <center>
+      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="ALL_TABS" BorderPane.alignment="CENTER" />
+   </center>
+   <stylesheets>
+      <URL value="@../css/bootstrapfx.css" />
+      <URL value="@../css/customized.css" />
+   </stylesheets>
+</BorderPane>

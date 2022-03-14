@@ -1,0 +1,82 @@
+/* table view start */
+.table-view > .column-header-background {
+    -fx-pref-height: 40px;
+}
+
+.table-row-cell {
+    -fx-cell-size: 35px;
+}
+
+.table-column {
+    -fx-alignment: CENTER-LEFT;
+}
+
+/* table view end*/
+
+/* table operation icon start */
+.column-button {
+    -fx-background-color:transparent ;
+    -fx-background-radius:0;
+    -fx-border-color:transparent;
+}
+
+.column-button:hover {
+    -fx-background-color:transparent;
+    -fx-background-radius:0;
+    -fx-border-color:transparent;
+}
+/* table operation icon end*/
+
+/* menu bar start */
+.top-menu-bar {
+    -fx-border-width: 0px 0px 3px 0px;
+    -fx-border-color: rgba(238,238,238,0.8);
+    -fx-color: rgba(255,255,255,0.9);
+}
+.top-menu-bar .menu-button {
+    -fx-background-color: transparent;
+}
+.top-menu-bar .menu-button:hover {
+    -fx-border-width: 0px 0px 3px 0px;
+    -fx-border-color: rgba(121,189,154,0.8);
+}
+.context-menu {
+    -fx-skin: "javafx.scene.control.skin.ContextMenuSkin";
+    -fx-background-color: white;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0 6 6 6, 0 5 5 5, 0 4 4 4;
+/*    -fx-padding: 0.666667em 0.083333em 0.666667em 0.083333em;  8 1 8 1 */
+    -fx-padding: 0.333333em 0.083333em 0.666667em 0.083333em; /* 4 1 8 1 */
+}
+
+.menu-item .label {
+    -fx-text-fill: black;
+}
+.menu-item:focused {
+    -fx-border-width: 0px 0px 2px 0px;
+    -fx-border-color: rgba(121,189,154,0.8);
+}
+.menu-item:focused .label, .ikonli-font-icon {
+    -fx-text-fill: cadetblue;
+}
+.menu-item:focused .ikonli-font-icon {
+    -fx-icon-color: cadetblue;
+}
+/* hide the arrow in menu button */
+.menu-button > .arrow-button {
+    -fx-padding: 0;
+}
+.menu-button > .arrow-button > .arrow {
+    -fx-padding: 0;
+}
+
+/* menu bar end*/
+
+
+/* validation start */
+.error-field {
+    -fx-border-color: RED;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+}
+/* validation end */

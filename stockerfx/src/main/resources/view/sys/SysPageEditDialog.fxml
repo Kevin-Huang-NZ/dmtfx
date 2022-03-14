@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<?import java.net.URL?>
+<?import java.lang.String?>
+<AnchorPane fx:id="sysPageEditPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mahara.stocker.controller.sys.SysPageEditDialogController">
+   <children>
+      <GridPane layoutX="12.0" layoutY="6.0" prefHeight="323.0" prefWidth="570.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="279.0" minWidth="10.0" prefWidth="128.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="448.0" minWidth="10.0" prefWidth="442.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="50.0" minHeight="3.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="50.0" minHeight="1.0" prefHeight="50.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="280.0" minHeight="10.0" prefHeight="220.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="页面名称" GridPane.halignment="RIGHT">
+               <GridPane.margin>
+                  <Insets right="20.0" />
+               </GridPane.margin></Label>
+            <Label text="页面标题" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets right="20.0" />
+               </GridPane.margin></Label>
+            <Label text="备注" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets right="20.0" />
+               </GridPane.margin></Label>
+            <TextField fx:id="pageNameField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="400.0" GridPane.columnIndex="1" />
+            <TextField fx:id="pageTitleField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="400.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextArea fx:id="memoField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+         </children>
+      </GridPane>
+      <ButtonBar layoutX="342.0" layoutY="346.0" prefHeight="40.0" prefWidth="200.0">
+        <buttons>
+          <Button mnemonicParsing="false" onAction="#handleSave" text="保存">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+              <styleClass>
+                  <String fx:value="btn" />
+                  <String fx:value="btn-primary" />
+              </styleClass>
+          </Button>
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" text="取消">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+                <styleClass>
+                    <String fx:value="btn" />
+                    <String fx:value="btn-default" />
+                </styleClass>
+            </Button>
+        </buttons>
+      </ButtonBar>
+   </children>
+    <stylesheets>
+        <URL value="@../../css/bootstrapfx.css" />
+        <URL value="@../../css/customized.css" />
+    </stylesheets>
+</AnchorPane>
