@@ -3,6 +3,8 @@ import re
 import pickle
 import numpy as np
 import pandas as pd
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
 
 PADDING_TOKEN = "~"
 START_TOKEN = "^"
@@ -14,6 +16,7 @@ DM_MAX_LENGTH_CHINESE = 50
 
 # DATA_FOLDER = "drive/MyDrive/Colab Notebooks/dmt/data"
 DATA_FOLDER = "data"
+BATCH_SIZE = 64
 
 
 def preprocess_dm_source(dm):
@@ -112,6 +115,12 @@ def dm_to_ids(dm_text, token_to_idx):
     return dm_ids_source, dm_ids_chinese
 
 
+def get_numpy_array_from_dataset(ds):
+    source = np.concatenate([inp for (inp, targ) in ds.as_numpy_iterator()])
+    target = np.concatenate([targ for (inp, targ) in ds.as_numpy_iterator()])
+    return source, target
+
+
 def preprocess_and_save():
     dm_text, token_to_idx, idx_to_token = load_data(os.path.join(DATA_FOLDER, "argentine-chinese.txt"))
 
@@ -122,8 +131,26 @@ def preprocess_and_save():
     # print(token_idx)
     # print(idx_token)
 
+    # shuffle
+    all_dataset = tf.data.Dataset.from_tensor_slices((dm_ids_source, dm_ids_chinese))
+    all_dataset = all_dataset.shuffle(6000).batch(BATCH_SIZE, drop_remainder=False)
+    all_npa_source, all_npa_chinese = get_numpy_array_from_dataset(all_dataset)
+
+    # split to train and validate
+    source_dm_train, source_dm_val, chinese_dm_train, chinese_dm_val = train_test_split(all_npa_source, all_npa_chinese,
+                                                                                        test_size=0.2)
+
+    # drop remainder
+    train_dataset = tf.data.Dataset.from_tensor_slices((source_dm_train, chinese_dm_train))
+    train_dataset = train_dataset.batch(BATCH_SIZE, drop_remainder=True)
+    val_dataset = tf.data.Dataset.from_tensor_slices((source_dm_val, chinese_dm_val))
+    val_dataset = val_dataset.batch(BATCH_SIZE, drop_remainder=True)
+    train_npa_source, train_npa_chinese = get_numpy_array_from_dataset(train_dataset)
+    val_npa_source, val_npa_chinese = get_numpy_array_from_dataset(val_dataset)
+
     pickle.dump((
-        (dm_ids_source, dm_ids_chinese),
+        (train_npa_source, train_npa_chinese),
+        (val_npa_source, val_npa_chinese),
         token_to_idx,
         idx_to_token), open(os.path.join(DATA_FOLDER, 'preprocess.p'), 'wb'))
 
