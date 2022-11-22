@@ -3,7 +3,6 @@ package com.mahara.fxgenerator.service;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,39 +82,87 @@ public class Generator {
 	}
 
 	public void generateAll(MetaData md) {
-		generateModel(md);
-		generateRepository(md);
-		generateRepositoryImpl(md);
-		generateControllerList(md);
-		generateControllerEdit(md);
-		generateViewList(md);
-		generateViewEdit(md);
-		generateAuthSQL(md);
+
+		HashMap<String, Object> root = new HashMap<String, Object>();
+
+
+		root.put("tableName", this.tableName);
+		root.put("ucTableName", this.ucTableName);
+		root.put("lcTableName", this.lcTableName);
+		root.put("lhTableName", this.lhTableName);
+		root.put("basePackage", md.getBasePkg());
+		root.put("modelPkg", md.getModelPkg());
+		root.put("modelName", getModelName());
+		root.put("repositoryPkg", md.getRepositoryPkg());
+		root.put("repositoryImplPkg", md.getRepositoryImplPkg());
+		root.put("repositoryName", getRepositoryName());
+		root.put("repositoryJdbcName", getRepositoryJdbcName());
+		root.put("repositoryJdbcImplName", getRepositoryJdbcImplName());
+		root.put("controllerPkg", md.getControllerPkg());
+		root.put("controllerName", getControllerName());
+		root.put("servicePkg", md.getServicePkg());
+		root.put("serviceImplPkg", md.getServiceImplPkg());
+		root.put("serviceName", getServiceName());
+		root.put("serviceImplName", getServiceImplName());
+		root.put("viewFolder", md.getViewFolder());
+		root.put("listViewName", getListViewName());
+		root.put("editViewName", getEditViewName());
+
+		List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
+		for(Column column : this.columns) {
+			Map<String, Object> fieldMap = new HashMap<String, Object>();
+
+			fieldMap.put("columnName", column.getColumnName());
+			fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
+			fieldMap.put("ucColumnName", NameConverter.upperCamel(column.getColumnName()));
+			fieldMap.put("javaDataType", dataTypeMapper.getJavaDataType(NameConverter.lowerCase(column.getDataType())));
+			fieldMap.put("isNullable", NameConverter.upperCase(column.getIsNullable()));
+			fieldMap.put("characterMaximumLength", column.getCharacterMaximumLength());
+			fieldMap.put("columnTitle", NameConverter.title(column.getColumnName()));
+
+			fields.add(fieldMap);
+		}
+		root.put("fields", fields);
+
+		if (firstConstraints != null) {
+			root.put("hasUniqueKey", true);
+
+			List<Map<String, Object>> ukFields = new ArrayList<Map<String, Object>>();
+			for(Column column : this.constraintColumns) {
+				Map<String, Object> fieldMap = new HashMap<String, Object>();
+
+				fieldMap.put("columnName", column.getColumnName());
+				fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
+				fieldMap.put("ucColumnName", NameConverter.upperCamel(column.getColumnName()));
+				fieldMap.put("javaDataType", dataTypeMapper.getJavaDataType(NameConverter.lowerCase(column.getDataType())));
+
+				ukFields.add(fieldMap);
+			}
+
+			root.put("ukFields", ukFields);
+		} else {
+			root.put("hasUniqueKey", false);
+		}
+
+		generateModel(md, root);
+		generateRepository(md, root);
+		generateRepositoryJdbc(md, root);
+		generateRepositoryJdbcImpl(md, root);
+		generateController(md, root);
+//		generateViewList(md, root);
+//		generateViewEdit(md, root);
+		generateAuthSQL(md, root);
+		if (firstConstraints != null) {
+			generateService(md, root);
+			generateServiceImpl(md, root);
+		}
 
 	}
 
-	public void generateModel(MetaData md) {
+	public void generateModel(MetaData md, HashMap<String, Object> root) {
 		OutputStreamWriter out = null;
 		try {
 			var template = FreeMarkerConfig.instance().cfg().getTemplate("model.ftl");
-
-			var root = new HashMap<String, Object>();
-
-			root.put("modelPkg", md.getModelPkg());
-			root.put("modelName", getModelName());
-			
-			var fields = new ArrayList<Map<String, Object>>();
-			for(var column : columns) {
-				var fieldMap = new HashMap<String, Object>();
-
-				fieldMap.put("ucColumnName", NameConverter.upperCamel(column.getColumnName()));
-				fieldMap.put("isNullable", NameConverter.upperCase(column.getIsNullable()));
-				fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
-				fieldMap.put("javaDataType", dataTypeMapper.getJavaDataType(NameConverter.lowerCase(column.getDataType())));
-				
-				fields.add(fieldMap);
-			}
-			root.put("fields", fields);
 
 			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getModelPath(), getModelName()+".java")), "UTF-8");
 			template.process(root, out);
@@ -133,35 +180,10 @@ public class Generator {
 		}
 	}
 
-	public void generateRepository(MetaData md) {
+	public void generateRepository(MetaData md, HashMap<String, Object> root) {
 		OutputStreamWriter out = null;
 		try {
 			var template = FreeMarkerConfig.instance().cfg().getTemplate("repository.ftl");
-			Map<String, Object> root = new HashMap<String, Object>();
-
-			root.put("basePackage", md.getBasePkg());
-			root.put("modelPkg", md.getModelPkg());
-			root.put("repositoryPkg", md.getRepositoryPkg());
-			root.put("modelName", getModelName());
-			root.put("repositoryName", getRepositoryName());
-
-			if (firstConstraints != null) {
-				root.put("hasUniqueKey", true);
-
-				List<Map<String, Object>> ukFields = new ArrayList<Map<String, Object>>();
-				for(Column column : this.constraintColumns) {
-					Map<String, Object> fieldMap = new HashMap<String, Object>();
-
-					fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
-					fieldMap.put("javaDataType", dataTypeMapper.getJavaDataType(NameConverter.lowerCase(column.getDataType())));
-
-					ukFields.add(fieldMap);
-				}
-
-				root.put("ukFields", ukFields);
-			} else {
-				root.put("hasUniqueKey", false);
-			}
 
 			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getRepositoryPath(), getRepositoryName()+".java")), "UTF-8");
 			template.process(root, out);
@@ -179,55 +201,33 @@ public class Generator {
 		}
 	}
 
-	public void generateRepositoryImpl(MetaData md) {
+	public void generateRepositoryJdbc(MetaData md, HashMap<String, Object> root) {
+		OutputStreamWriter out = null;
+		try {
+			var template = FreeMarkerConfig.instance().cfg().getTemplate("repository-jdbc.ftl");
+
+			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getRepositoryPath(), getRepositoryJdbcName()+".java")), "UTF-8");
+			template.process(root, out);
+
+			out.close();
+		} catch (Exception e) {
+			log.error("Failed to get template.", e);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+
+	public void generateRepositoryJdbcImpl(MetaData md, HashMap<String, Object> root) {
 		OutputStreamWriter out = null;
 		try {
 			var template = FreeMarkerConfig.instance().cfg().getTemplate("repository-impl.ftl");
-			Map<String, Object> root = new HashMap<String, Object>();
 
-			root.put("basePackage", md.getBasePkg());
-			root.put("modelPkg", md.getModelPkg());
-			root.put("repositoryPkg", md.getRepositoryPkg());
-			root.put("repositoryImplPkg", md.getRepositoryImplPkg());
-			root.put("modelName", getModelName());
-			root.put("repositoryName", getRepositoryName());
-			root.put("repositoryImplName", getRepositoryImplName());
-
-			root.put("tableName", this.tableName);
-
-			List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-			for(Column column : this.columns) {
-				Map<String, Object> fieldMap = new HashMap<String, Object>();
-
-				fieldMap.put("columnName", column.getColumnName());
-				fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
-				fieldMap.put("ucColumnName", NameConverter.upperCamel(column.getColumnName()));
-				fieldMap.put("javaDataType", dataTypeMapper.getJavaDataType(NameConverter.lowerCase(column.getDataType())));
-
-				fields.add(fieldMap);
-			}
-			root.put("fields", fields);
-
-			if (firstConstraints != null) {
-				root.put("hasUniqueKey", true);
-
-				List<Map<String, Object>> ukFields = new ArrayList<Map<String, Object>>();
-				for(Column column : this.constraintColumns) {
-					Map<String, Object> fieldMap = new HashMap<String, Object>();
-
-					fieldMap.put("columnName", column.getColumnName());
-					fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
-					fieldMap.put("javaDataType", dataTypeMapper.getJavaDataType(NameConverter.lowerCase(column.getDataType())));
-
-					ukFields.add(fieldMap);
-				}
-
-				root.put("ukFields", ukFields);
-			} else {
-				root.put("hasUniqueKey", false);
-			}
-
-			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getRepositoryImplPath(), getRepositoryImplName()+".java")), "UTF-8");
+			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getRepositoryImplPath(), getRepositoryJdbcImplName()+".java")), "UTF-8");
 			template.process(root, out);
 
 			out.close();
@@ -243,37 +243,12 @@ public class Generator {
 		}
 	}
 
-	public void generateControllerList(MetaData md) {
+	public void generateController(MetaData md, HashMap<String, Object> root) {
 		OutputStreamWriter out = null;
 		try {
-			var template = FreeMarkerConfig.instance().cfg().getTemplate("controller-list.ftl");
-			Map<String, Object> root = new HashMap<String, Object>();
+			var template = FreeMarkerConfig.instance().cfg().getTemplate("controller.ftl");
 
-			root.put("lcTableName", lcTableName);
-			root.put("basePackage", md.getBasePkg());
-			root.put("modelPkg", md.getModelPkg());
-			root.put("repositoryPkg", md.getRepositoryPkg());
-			root.put("controllerPkg", md.getControllerPkg());
-			root.put("modelName", getModelName());
-			root.put("repositoryName", getRepositoryName());
-			root.put("listControllerName", getListControllerName());
-			root.put("editControllerName", getEditControllerName());
-			root.put("viewFolder", md.getViewFolder());
-			root.put("editViewName", getEditViewName());
-
-			List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-			for(Column column : this.columns) {
-				Map<String, Object> fieldMap = new HashMap<String, Object>();
-
-				fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
-				fieldMap.put("ucColumnName", NameConverter.upperCamel(column.getColumnName()));
-				fieldMap.put("javaDataType", dataTypeMapper.getJavaDataType(NameConverter.lowerCase(column.getDataType())));
-
-				fields.add(fieldMap);
-			}
-			root.put("fields", fields);
-
-			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getControllerPath(), getListControllerName()+".java")), "UTF-8");
+			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getControllerPath(), getControllerName()+".java")), "UTF-8");
 			template.process(root, out);
 
 			out.close();
@@ -289,58 +264,12 @@ public class Generator {
 		}
 	}
 
-	public void generateControllerEdit(MetaData md) {
+	public void generateService(MetaData md, HashMap<String, Object> root) {
 		OutputStreamWriter out = null;
 		try {
-			var template = FreeMarkerConfig.instance().cfg().getTemplate("controller-edit.ftl");
-			Map<String, Object> root = new HashMap<String, Object>();
+			var template = FreeMarkerConfig.instance().cfg().getTemplate("service.ftl");
 
-			root.put("lcTableName", lcTableName);
-			root.put("basePackage", md.getBasePkg());
-			root.put("modelPkg", md.getModelPkg());
-			root.put("repositoryPkg", md.getRepositoryPkg());
-			root.put("controllerPkg", md.getControllerPkg());
-			root.put("modelName", getModelName());
-			root.put("repositoryName", getRepositoryName());
-			root.put("listControllerName", getListControllerName());
-			root.put("editControllerName", getEditControllerName());
-			root.put("viewFolder", md.getViewFolder());
-			root.put("editViewName", getEditViewName());
-
-			List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-			for(Column column : this.columns) {
-				Map<String, Object> fieldMap = new HashMap<String, Object>();
-
-				fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
-				fieldMap.put("ucColumnName", NameConverter.upperCamel(column.getColumnName()));
-				fieldMap.put("javaDataType", dataTypeMapper.getJavaDataType(NameConverter.lowerCase(column.getDataType())));
-				fieldMap.put("isNullable", NameConverter.upperCase(column.getIsNullable()));
-				fieldMap.put("characterMaximumLength", column.getCharacterMaximumLength());
-				fieldMap.put("columnTitle", NameConverter.title(column.getColumnName()));
-
-				fields.add(fieldMap);
-			}
-			root.put("fields", fields);
-
-			if (firstConstraints != null) {
-				root.put("hasUniqueKey", true);
-
-				List<Map<String, Object>> ukFields = new ArrayList<Map<String, Object>>();
-				for(Column column : this.constraintColumns) {
-					Map<String, Object> fieldMap = new HashMap<String, Object>();
-
-					fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
-					fieldMap.put("javaDataType", dataTypeMapper.getJavaDataType(NameConverter.lowerCase(column.getDataType())));
-
-					ukFields.add(fieldMap);
-				}
-
-				root.put("ukFields", ukFields);
-			} else {
-				root.put("hasUniqueKey", false);
-			}
-
-			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getControllerPath(), getEditControllerName()+".java")), "UTF-8");
+			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getServicePath(), getServiceName()+".java")), "UTF-8");
 			template.process(root, out);
 
 			out.close();
@@ -356,26 +285,31 @@ public class Generator {
 		}
 	}
 
-	public void generateViewList(MetaData md) {
+	public void generateServiceImpl(MetaData md, HashMap<String, Object> root) {
+		OutputStreamWriter out = null;
+		try {
+			var template = FreeMarkerConfig.instance().cfg().getTemplate("service-impl.ftl");
+
+			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getServiceImplPath(), getServiceImplName()+".java")), "UTF-8");
+			template.process(root, out);
+
+			out.close();
+		} catch (Exception e) {
+			log.error("Failed to get template.", e);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+
+	public void generateViewList(MetaData md, HashMap<String, Object> root) {
 		OutputStreamWriter out = null;
 		try {
 			var template = FreeMarkerConfig.instance().cfg().getTemplate("view-list.ftl");
-			Map<String, Object> root = new HashMap<String, Object>();
-
-			root.put("lcTableName", lcTableName);
-			root.put("controllerPkg", md.getControllerPkg());
-			root.put("listControllerName", getListControllerName());
-
-			List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-			for(Column column : this.columns) {
-				Map<String, Object> fieldMap = new HashMap<String, Object>();
-
-				fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
-				fieldMap.put("columnTitle", NameConverter.title(column.getColumnName()));
-
-				fields.add(fieldMap);
-			}
-			root.put("fields", fields);
 
 			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getViewPath(), getListViewName()+".fxml")), "UTF-8");
 			template.process(root, out);
@@ -393,32 +327,10 @@ public class Generator {
 		}
 	}
 
-	public void generateViewEdit(MetaData md) {
+	public void generateViewEdit(MetaData md, HashMap<String, Object> root) {
 		OutputStreamWriter out = null;
 		try {
 			var template = FreeMarkerConfig.instance().cfg().getTemplate("view-edit.ftl");
-			Map<String, Object> root = new HashMap<String, Object>();
-
-			root.put("lcTableName", lcTableName);
-			root.put("controllerPkg", md.getControllerPkg());
-			root.put("editControllerName", getEditControllerName());
-
-			var inputAreaHeight = 50.0 * this.columns.size();
-			root.put("inputAreaHeight", inputAreaHeight);
-			root.put("totalHeight", inputAreaHeight + 80);
-			root.put("buttonBarY", inputAreaHeight + 20);
-
-
-			List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-			for(Column column : this.columns) {
-				Map<String, Object> fieldMap = new HashMap<String, Object>();
-
-				fieldMap.put("lcColumnName", NameConverter.lowerCamel(column.getColumnName()));
-				fieldMap.put("columnTitle", NameConverter.title(column.getColumnName()));
-
-				fields.add(fieldMap);
-			}
-			root.put("fields", fields);
 
 			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getViewPath(), getEditViewName()+".fxml")), "UTF-8");
 			template.process(root, out);
@@ -436,13 +348,10 @@ public class Generator {
 		}
 	}
 
-	public void generateAuthSQL(MetaData md) {
+	public void generateAuthSQL(MetaData md, HashMap<String, Object> root) {
 		OutputStreamWriter out = null;
 		try {
 			var template = FreeMarkerConfig.instance().cfg().getTemplate("auth-sql.ftl");
-			Map<String, Object> root = new HashMap<String, Object>();
-
-			root.put("ucTableName", ucTableName);
 
 			out = new OutputStreamWriter(Files.newOutputStream(Paths.get(md.getBaseFolder(), tableName+".sql")), "UTF-8");
 			template.process(root, out);
@@ -466,14 +375,26 @@ public class Generator {
 	private String getRepositoryName() {
 		return this.ucTableName + "Repository";
 	}
-	private String getRepositoryImplName() {
-		return this.ucTableName + "RepositoryImpl";
+	private String getRepositoryJdbcName() {
+		return this.ucTableName + "Jdbc";
 	}
-	private String getListControllerName() {
-		return this.ucTableName + "ListController";
+	private String getRepositoryJdbcImplName() {
+		return this.ucTableName + "JdbcImpl";
 	}
-	private String getEditControllerName() {
-		return this.ucTableName + "EditController";
+	private String getControllerName() {
+		return this.ucTableName + "Controller";
+	}
+//	private String getListControllerName() {
+//		return this.ucTableName + "ListController";
+//	}
+//	private String getEditControllerName() {
+//		return this.ucTableName + "EditController";
+//	}
+	private String getServiceName() {
+	return this.ucTableName + "Service";
+}
+	private String getServiceImplName() {
+		return this.ucTableName + "ServiceImpl";
 	}
 	private String getListViewName() {
 		return this.ucTableName + "List";

@@ -39,12 +39,14 @@ public class HomeController {
     private static final String KEY_SCHEMA = "schema";
     private static final String KEY_BASE_PACKAGE = "basePackage";
 
-    public static final String PACKAGE_CONTROLLER = ".controller";
-    public static final String PACKAGE_REPOSITORY = ".dao";
-    public static final String PACKAGE_REPOSITORY_IMPL = ".dao.jt";
-    public static final String PACKAGE_MODEL = ".model";
+    public static final String PACKAGE_CONTROLLER = ".web.controller";
+    public static final String PACKAGE_REPOSITORY = ".core.dao";
+    public static final String PACKAGE_REPOSITORY_IMPL = ".core.dao.impl";
+    public static final String PACKAGE_MODEL = ".core.model";
+    public static final String PACKAGE_SERVICE = ".core.service";
+    public static final String PACKAGE_SERVICE_IMPL = ".core.service.impl";
 
-    public static final String FOLDER_NAME_VIEW = "view";
+    public static final String FOLDER_NAME_VIEW = "html";
 
     @FXML
     private AnchorPane homePane;
@@ -231,6 +233,8 @@ public class HomeController {
         var repositoryImplPath = MakeDir.makeByPackage(outFolder, basePackage + PACKAGE_REPOSITORY_IMPL);
         var controllerPath = MakeDir.makeByPackage(outFolder, basePackage + PACKAGE_CONTROLLER);
         var viewPath = MakeDir.makeByPackage(outFolder, FOLDER_NAME_VIEW);
+        var servicePath = MakeDir.makeByPackage(outFolder, basePackage + PACKAGE_SERVICE);
+        var serviceImplPath = MakeDir.makeByPackage(outFolder, basePackage + PACKAGE_SERVICE_IMPL);
 
         MetaData metaData = new MetaData();
         metaData.setBaseFolder(outFolder);
@@ -241,6 +245,10 @@ public class HomeController {
         metaData.setRepositoryPath(repositoryPath.toString());
         metaData.setRepositoryImplPkg(basePackage + PACKAGE_REPOSITORY_IMPL);
         metaData.setRepositoryImplPath(repositoryImplPath.toString());
+        metaData.setServicePkg(basePackage + PACKAGE_SERVICE);
+        metaData.setServicePath(servicePath.toString());
+        metaData.setServiceImplPkg(basePackage + PACKAGE_SERVICE_IMPL);
+        metaData.setServiceImplPath(serviceImplPath.toString());
         metaData.setControllerPkg(basePackage + PACKAGE_CONTROLLER);
         metaData.setControllerPath(controllerPath.toString());
         metaData.setViewFolder(FOLDER_NAME_VIEW);

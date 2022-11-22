@@ -1,114 +1,65 @@
 package [=modelPkg];
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import cn.gov.mca.dmtp.util.ValidatorPattern;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.Instant;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
+import javax.validation.groups.Default;
+import java.io.Serializable;
 
-public class [=modelName] {
-    private final LongProperty id;
-	<#list fields as field>
+@Entity
+@Data
+@NoArgsConstructor
+public class [=modelName] implements Serializable {
+  public interface Create extends Default {
+  }
+
+  public interface Update extends Default {
+  }
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @NotNull(
+      message = "请指定要修改的对象。",
+      groups = {Update.class})
+  @Null(
+      message = "新建对象时，不能指定id。",
+      groups = {Create.class})
+  private Long id;
+
+<#list fields as field>
+    <#if field.isNullable == 'YES' >
+        <#if field.characterMaximumLength?has_content >
+  @Length(max = [=field.characterMaximumLength], message = "[=field.columnTitle]超长，最多[=field.characterMaximumLength]字符。")
+        </#if>
+    <#else>
         <#switch field.javaDataType>
             <#case 'String'>
-    private final StringProperty [=field.lcColumnName];
-                <#break>
-            <#case 'Long'>
-    private final LongProperty [=field.lcColumnName];
-                <#break>
-            <#case 'Integer'>
-    private final IntegerProperty [=field.lcColumnName];
+  @NotBlank(message = "[=field.columnTitle]不能为空。")
                 <#break>
             <#default>
-    private final ObjectProperty<[=field.javaDataType]> [=field.lcColumnName];
+  @NotNull(message = "[=field.columnTitle]不能为空。")
+                <#break>
         </#switch>
-	</#list>
-
-    public [=modelName]() {
-        this(0l);
-    }
-
-    public [=modelName](Long id) {
-        this.id = new SimpleLongProperty(id);
-        <#list fields as field>
-            <#if field.isNullable == 'YES' >
-                <#switch field.javaDataType>
-                    <#case 'String'>
-        this.[=field.lcColumnName] = new SimpleStringProperty(null);
-                        <#break>
-                    <#case 'Long'>
-        this.[=field.lcColumnName] = new SimpleLongProperty(null);
-                        <#break>
-                    <#case 'Integer'>
-        this.[=field.lcColumnName] = new IntegerProperty(null);
-                        <#break>
-                    <#default>
-        this.[=field.lcColumnName] = new SimpleObjectProperty<[=field.javaDataType]>(null);
-                </#switch>
-            <#else>
-                <#switch field.javaDataType>
-                    <#case 'String'>
-        this.[=field.lcColumnName] = new SimpleStringProperty("");
-                        <#break>
-                    <#case 'Long'>
-        this.[=field.lcColumnName] = new SimpleLongProperty(0l);
-                        <#break>
-                    <#case 'Integer'>
-        this.[=field.lcColumnName] = new IntegerProperty(0);
-                        <#break>
-                    <#case 'BigDecimal'>
-        this.[=field.lcColumnName] = new SimpleObjectProperty<Timestamp>(BigDecimal.zero);
-                        <#break>
-                    <#case 'Timestamp'>
-        this.[=field.lcColumnName] = new SimpleObjectProperty<Timestamp>(Timestamp.from(Instant.now()));
-                        <#break>
-                    <#default>
-        this.[=field.lcColumnName] = new SimpleObjectProperty<[=field.javaDataType]>(null);
-                </#switch>
-            </#if>
-        </#list>
-    }
-
-    public long getId() {
-        return id.get();
-    }
-
-    public LongProperty idProperty() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id.set(id);
-    }
-
-	<#list fields as field>
-	public [=field.javaDataType] get[=field.ucColumnName]() {
-		return [=field.lcColumnName].get();
-	}
-        <#switch field.javaDataType>
-            <#case 'String'>
-    public StringProperty [=field.lcColumnName]Property() {
-                <#break>
-            <#case 'Long'>
-    public LongProperty [=field.lcColumnName]Property() {
-                <#break>
-            <#case 'Integer'>
-    public IntegerProperty [=field.lcColumnName]Property() {
-                <#break>
-            <#default>
-    public SimpleObjectProperty<[=field.javaDataType]> [=field.lcColumnName]Property() {
-        </#switch>
-        return [=field.lcColumnName];
-    }
-	public void set[=field.ucColumnName]([=field.javaDataType] [=field.lcColumnName]) {
-		this.[=field.lcColumnName].set([=field.lcColumnName]);
-	}
-	</#list>
+        <#if field.characterMaximumLength?has_content >
+  @Length(max = [=field.characterMaximumLength], message = "[=field.columnTitle]超长，最多[=field.characterMaximumLength]字符。")
+        </#if>
+    </#if>
+  private [=field.javaDataType] [=field.lcColumnName];
+</#list>
+//  @Pattern(regexp = ValidatorPattern.REGEX_YMD, message = "生日格式不正确，格式要求：yyyy-MM-dd。")
+//  @Pattern(regexp = ValidatorPattern.REGEX_MOBILE, message = "手机号格式不正确。")
+//  @Pattern(
+//      regexp = ValidatorPattern.REGEX_PASSWORD,
+//      message = "密码不满足安全要求。要求如下：1、密码需包含数字、大小写英文字母；2-可以包含符号._~!@#$^&*；3-长度在8~20位之间。")
+//  @Pattern(regexp = "^[0,1]$", message = "状态选择范围：0-冻结；1-正常。")
 }

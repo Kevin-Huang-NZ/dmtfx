@@ -9,6 +9,10 @@ public class MetaData {
     private String repositoryPath;
     private String repositoryImplPkg;
     private String repositoryImplPath;
+    private String servicePkg;
+    private String servicePath;
+    private String serviceImplPkg;
+    private String serviceImplPath;
     private String controllerPkg;
     private String controllerPath;
     private String viewFolder;
@@ -92,6 +96,38 @@ public class MetaData {
 
     public void setControllerPath(String controllerPath) {
         this.controllerPath = controllerPath;
+    }
+
+    public String getServicePkg() {
+        return servicePkg;
+    }
+
+    public void setServicePkg(String servicePkg) {
+        this.servicePkg = servicePkg;
+    }
+
+    public String getServicePath() {
+        return servicePath;
+    }
+
+    public void setServicePath(String servicePath) {
+        this.servicePath = servicePath;
+    }
+
+    public String getServiceImplPkg() {
+        return serviceImplPkg;
+    }
+
+    public void setServiceImplPkg(String serviceImplPkg) {
+        this.serviceImplPkg = serviceImplPkg;
+    }
+
+    public String getServiceImplPath() {
+        return serviceImplPath;
+    }
+
+    public void setServiceImplPath(String serviceImplPath) {
+        this.serviceImplPath = serviceImplPath;
     }
 
     public String getViewFolder() {
