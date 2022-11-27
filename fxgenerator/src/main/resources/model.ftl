@@ -61,5 +61,5 @@ public class [=modelName] implements Serializable {
 //  @Pattern(
 //      regexp = ValidatorPattern.REGEX_PASSWORD,
 //      message = "密码不满足安全要求。要求如下：1、密码需包含数字、大小写英文字母；2-可以包含符号._~!@#$^&*；3-长度在8~20位之间。")
-//  @Pattern(regexp = "^[0,1]$", message = "状态选择范围：0-冻结；1-正常。")
+//  @Pattern(regexp = "^[01]$", message = "状态选择范围：0-冻结；1-正常。")
 }
